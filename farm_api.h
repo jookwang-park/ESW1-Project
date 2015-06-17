@@ -13,4 +13,8 @@
 #define LED_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM+15, unsigned long *)
 #define LED_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM+16, unsigned long *)
 
+// Define Speaker IOCTL Commands
+#define SPEAKER_PLAY	_IOWR(IOCTL_NUM, IOCTL_START_NUM+20, unsigned long *)
+#define SPEAKER_STOP	_IOWR(IOCTL_NUM, IOCTL_START_NUM+21, unsigned long *)
+
 
