@@ -6,6 +6,7 @@
 #include <linux/gpio.h>
 #include "farm.h"
 #include "motor.h"
+#include "led.h"
 
 MODULE_LICENSE("GPL");
 
@@ -34,12 +35,15 @@ static long farm_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 	switch(cmd) {
 		case MOTOR_OFF:
 			module_motor_off();
-			printk("Off\n");
 			break;
 		case MOTOR_ON:
 			module_motor_on();
-			printk("On\n");
 			break;
+		case LED_OFF:
+			module_led_off();
+			break;
+		case LED_ON:
+			module_led_on();
 		default:
 			break;
 	}
@@ -62,6 +66,10 @@ static int __init farm_init(void) {
 	ret = module_motor_init();	
 	if( ret < 0 ) return -1;
 
+	// Initialize LED Device
+	ret = module_led_init();	
+	if( ret < 0 ) return -1;
+
 	printk("Hello Farm!\n");
 	return 0;
 }
@@ -76,6 +84,7 @@ static void __exit farm_exit(void) {
 
 	// Destroy Other Modules
 	module_motor_exit();
+	module_led_exit();
 
 	printk("Goodbye Farm!\n");
 }

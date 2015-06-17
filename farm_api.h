@@ -9,4 +9,8 @@
 #define MOTOR_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM + 10, unsigned long *)
 #define MOTOR_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM + 11, unsigned long *)
 
+// Define LED IOCTL Commands
+#define LED_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM+15, unsigned long *)
+#define LED_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM+16, unsigned long *)
+
 
