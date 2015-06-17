@@ -7,6 +7,7 @@
 #include "farm.h"
 #include "motor.h"
 #include "led.h"
+#include "speaker.h"
 
 MODULE_LICENSE("GPL");
 
@@ -44,6 +45,12 @@ static long farm_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 			break;
 		case LED_ON:
 			module_led_on();
+		case SPEAKER_PLAY:
+			module_speaker_play();
+			break;
+		case SPEAKER_STOP:
+			module_speaker_stop();
+			break;
 		default:
 			break;
 	}
@@ -70,6 +77,10 @@ static int __init farm_init(void) {
 	ret = module_led_init();	
 	if( ret < 0 ) return -1;
 
+	// Initialize SPEAKER Device
+	ret = module_speaker_init();	
+	if( ret < 0 ) return -1;
+
 	printk("Hello Farm!\n");
 	return 0;
 }
@@ -85,6 +96,7 @@ static void __exit farm_exit(void) {
 	// Destroy Other Modules
 	module_motor_exit();
 	module_led_exit();
+	module_speaker_exit();
 
 	printk("Goodbye Farm!\n");
 }
