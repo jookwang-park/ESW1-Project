@@ -8,6 +8,7 @@
 #include "motor.h"
 #include "led.h"
 #include "speaker.h"
+#include "spi.h"
 
 MODULE_LICENSE("GPL");
 
@@ -51,6 +52,12 @@ static long farm_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 		case SPEAKER_STOP:
 			module_speaker_stop();
 			break;
+		case SPI_ON:
+			module_spi_on();
+			break;
+		case SPI_OFF:
+			module_spi_off();
+			break;
 		default:
 			break;
 	}
@@ -81,6 +88,10 @@ static int __init farm_init(void) {
 	ret = module_speaker_init();	
 	if( ret < 0 ) return -1;
 
+	// Initialize SPI Device
+	ret = module_spi_init();	
+	if( ret < 0 ) return -1;
+
 	printk("Hello Farm!\n");
 	return 0;
 }
@@ -97,7 +108,7 @@ static void __exit farm_exit(void) {
 	module_motor_exit();
 	module_led_exit();
 	module_speaker_exit();
-
+	module_spi_exit();
 	printk("Goodbye Farm!\n");
 }
 

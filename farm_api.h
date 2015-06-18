@@ -17,4 +17,8 @@
 #define SPEAKER_PLAY	_IOWR(IOCTL_NUM, IOCTL_START_NUM+20, unsigned long *)
 #define SPEAKER_STOP	_IOWR(IOCTL_NUM, IOCTL_START_NUM+21, unsigned long *)
 
+// Define SPI IOCTL Commands
+#define SPI_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM+30, unsigned long *)
+#define SPI_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM+31, unsigned long *)
+
 
