@@ -13,6 +13,8 @@ copy:
 	scp -P $(PORT) farm_mod.ko $(USER)@$(HOST):$(HOST_PATH)
 	scp -P $(PORT) *.sh $(USER)@$(HOST):$(HOST_PATH)
 	scp -P $(PORT) *.out $(USER)@$(HOST):$(HOST_PATH)
+app:
+	arm-none-linux-gnueabi-gcc -o daemon.out ./daemon/main.c ./daemon/util.c motor_api.c farm_api.c led_api.c speaker_api.c spi_api.c dht_api.c -lpthread
 test:
 	arm-none-linux-gnueabi-gcc -o test.out test.c motor_api.c farm_api.c led_api.c speaker_api.c spi_api.c dht_api.c -lpthread
 clean:
