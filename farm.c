@@ -4,11 +4,13 @@
 #include <linux/cdev.h>
 #include <linux/fs.h>
 #include <linux/gpio.h>
+#include <linux/uaccess.h>
 #include "farm.h"
 #include "motor.h"
 #include "led.h"
 #include "speaker.h"
 #include "spi.h"
+#include "dht.h"
 
 MODULE_LICENSE("GPL");
 
@@ -34,6 +36,8 @@ static int farm_release(struct inode *inode, struct file *file) {
 }
 
 static long farm_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
+	int value = 0;
+	unsigned long copy_size = 0;
 	switch(cmd) {
 		case MOTOR_OFF:
 			module_motor_off();
@@ -57,6 +61,22 @@ static long farm_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 			break;
 		case SPI_OFF:
 			module_spi_off();
+			break;
+		case DHT_ON:
+			module_dht_on();
+			break;
+		case DHT_OFF:
+			module_dht_off();
+			break;
+		case DHT_SET_INPUT:
+			module_dht_set_input();
+			break;
+		case DHT_SET_OUTPUT:
+			module_dht_set_output();
+			break;
+		case DHT_GET_DATA:
+			value = module_dht_get_value();
+			copy_size = copy_to_user((int*)arg, (int*)&value, sizeof(value));
 			break;
 		default:
 			break;
@@ -92,6 +112,10 @@ static int __init farm_init(void) {
 	ret = module_spi_init();	
 	if( ret < 0 ) return -1;
 
+	// Initialize DHT Device
+	ret = module_dht_init();	
+	if( ret < 0 ) return -1;
+
 	printk("Hello Farm!\n");
 	return 0;
 }
@@ -109,6 +133,7 @@ static void __exit farm_exit(void) {
 	module_led_exit();
 	module_speaker_exit();
 	module_spi_exit();
+	module_dht_exit();
 	printk("Goodbye Farm!\n");
 }
 
