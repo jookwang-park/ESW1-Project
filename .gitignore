@@ -6,3 +6,4 @@ modules.order
 .*
 *.out
 *.ko
+UserTest
