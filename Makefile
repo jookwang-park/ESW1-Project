@@ -14,7 +14,7 @@ copy:
 	scp -P $(PORT) *.sh $(USER)@$(HOST):$(HOST_PATH)
 	scp -P $(PORT) *.out $(USER)@$(HOST):$(HOST_PATH)
 app:
-	arm-none-linux-gnueabi-gcc -o daemon.out ./daemon/main.c ./daemon/util.c ./daemon/sprinkler.c motor_api.c farm_api.c led_api.c speaker_api.c spi_api.c dht_api.c -lpthread -L daemon/lib -lpaho-mqtt3c -lpaho-mqtt3a -g -ggdb
+	arm-none-linux-gnueabi-gcc -o daemon.out ./daemon/main.c ./daemon/util.c ./daemon/sprinkler.c motor_api.c farm_api.c led_api.c speaker_api.c spi_api.c dht_api.c -lpthread -L daemon/lib -lpaho-mqtt3c -lpaho-mqtt3a ./daemon/light.c -g -ggdb
 test:
 	arm-none-linux-gnueabi-gcc -o test.out test.c motor_api.c farm_api.c led_api.c speaker_api.c spi_api.c dht_api.c -lpthread
 clean:

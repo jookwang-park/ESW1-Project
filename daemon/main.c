@@ -12,13 +12,16 @@
 #include "include/MQTTClient.h"
 
 extern void *sprinkler_init(void *data);
+extern void *light_init(void *data);
 
 int main(int argc, char *argv[]) {
+
 	MQTTClient *client;
 	int rc = 0;
 	int farm_fd = 0;
 	char topic_status[16] = {0,};
 	pthread_t sprinkler;
+	pthread_t light;
 	struct daemon_info_t info;
 
 	/*   
@@ -40,27 +43,44 @@ int main(int argc, char *argv[]) {
 	setsid();
 
 	*/
-
+	
 	// MQTT Setting
 	client = (MQTTClient*)mqtt_create(argv[1], NULL);
 	mqtt_topic(argv[1], "status", topic_status);
 	mqtt_pub(client, "Daemon Start", topic_status, 0);
-
+	
 	// Open Device Driver
 	farm_fd = farm_open();	
+
+	// SPI Setup
+	SPI_SetupMode(8000000, 0);
 
 	//
 	info.dev_name = argv[1];
 	info.farm_fd = farm_fd;
+	info.mqtt = (void*)client;
 	
 	// Load Sub Module 
 	pthread_create(&sprinkler, NULL, sprinkler_init, (void*)&info);
 	pthread_detach(sprinkler);
+
+	// Load Light Module 
+	pthread_create(&light, NULL, light_init, (void*)&info);
+	pthread_detach(light);
 
 	// Daemon Start
 	while(1) {
 		sleepu(1000);
 	}
 
+
+
 	return 0;
 }
+
+
+
+
+// void light_handler(int avg) {
+// 	printf("Light Value Average: %d\n", avg);
+// }

@@ -17,6 +17,7 @@ void farm_close() {
 	close(farm_fd);
 }
 
+//1000 = 1 sec
 void sleepm(unsigned int size) {
   struct timespec sleeper, dummy ;
 
@@ -39,6 +40,7 @@ void sleepu_hard (unsigned int size) {
     gettimeofday(&tNow, NULL) ;
 }
 
+//1000000 = 1sec
 void sleepu (unsigned int size) {
   struct timespec sleeper ;
 
