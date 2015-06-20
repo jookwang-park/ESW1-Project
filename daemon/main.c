@@ -42,9 +42,9 @@ int main(int argc, char *argv[]) {
 	*/
 
 	// MQTT Setting
-	client = (MQTTClient*)mqtt_create(argv[1]);
+	client = (MQTTClient*)mqtt_create(argv[1], NULL);
 	mqtt_topic(argv[1], "status", topic_status);
-	mqtt_pub(argv[1], client, "Daemon Start", topic_status);
+	mqtt_pub(client, "Daemon Start", topic_status, 0);
 
 	// Open Device Driver
 	farm_fd = farm_open();	
@@ -52,7 +52,6 @@ int main(int argc, char *argv[]) {
 	//
 	info.dev_name = argv[1];
 	info.farm_fd = farm_fd;
-	info.mqtt = (void*)client;
 	
 	// Load Sub Module 
 	pthread_create(&sprinkler, NULL, sprinkler_init, (void*)&info);
@@ -60,7 +59,7 @@ int main(int argc, char *argv[]) {
 
 	// Daemon Start
 	while(1) {
-		usleep(1000);
+		sleepu(1000);
 	}
 
 	return 0;
