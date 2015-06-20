@@ -1,7 +1,9 @@
-*
-!*.c
-!*.h
-!*.ko
-!*.sh
-!Makefile
-!.gitignore
+*.mod.c
+*.mod.o
+*.o
+Module.symvers
+modules.order
+.*
+*.out
+*.ko
+UserTest
