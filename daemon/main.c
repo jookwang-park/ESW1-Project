@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
 	pthread_t light;
 	struct daemon_info_t info;
 
+
+
 	/*   
 	pid_t pid;	
 	pid = fork();
