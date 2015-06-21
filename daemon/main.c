@@ -14,6 +14,7 @@
 extern void *sprinkler_init(void *data);
 extern void *light_init(void *data);
 extern void *htmodule_init(void *data);
+extern void *sparrow_init(void *data);
 
 int main(int argc, char *argv[]) {
 
@@ -24,10 +25,8 @@ int main(int argc, char *argv[]) {
 	pthread_t sprinkler;
 	pthread_t light;
 	pthread_t sparrow;
-	struct daemon_info_t info;
-
-	//htmodule thread
 	pthread_t htmodule;
+	struct daemon_info_t info;
 
 
 
@@ -74,6 +73,10 @@ int main(int argc, char *argv[]) {
 	// Load Light Module 
 	pthread_create(&light, NULL, light_init, (void*)&info);
 	pthread_detach(light);
+
+	// Load Sparrow Module 
+	pthread_create(&sparrow, NULL, sparrow_init, (void*)&info);
+	pthread_detach(sparrow);
 
 	// Load htmodule Module 
 	pthread_create(&htmodule, NULL, htmodule_init, (void*)&info);
