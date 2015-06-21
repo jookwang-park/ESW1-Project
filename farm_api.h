@@ -21,6 +21,10 @@
 #define SPI_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM+30, unsigned long *)
 #define SPI_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM+31, unsigned long *)
 
+//define Motor IOCTL Command
+#define	PIR_SET_SENS	_IOWR(IOCTL_NUM, IOCTL_START_NUM+40, unsigned long *)
+#define	PIR_GET_DATA	_IOWR(IOCTL_NUM, IOCTL_START_NUM+41, unsigned long *)
+
 // Define DHT IOCTL Commands
 #define DHT_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM+60, unsigned long *)
 #define DHT_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM+61, unsigned long *)
