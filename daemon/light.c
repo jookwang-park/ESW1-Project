@@ -7,30 +7,14 @@
 #include "include/MQTTClient.h"
 
 /*
-func
-
 State machine 
-
 config->start->config   
-
 init 에서 mqtt 설정하기
-
-
-Topic 구독 방법 
-$ mosquitto_sub -t dev2/# 
-
-Topic 발행 방법 
-$ mosquitto_pub -t dev2/test -m "Message"
-
 설정 받는 토픽 
 dev2/config
-
-
 SET light_x 10
 SET light_y 10
 SET light_z 800
-
-Sprinkler 쪽에서 
 */
 void light_handler(int avg);
 
@@ -196,7 +180,6 @@ void light_handler(int avg) {
   	}else{
   		nightday = 0;
   	}
-  	
   }  else if(t->tm_mon>=12 || t->tm_mon<=2){
   	season = WINTER;
   	if(t->tm_hour <= 17 && t->tm_hour >= 6){
@@ -204,7 +187,6 @@ void light_handler(int avg) {
   	}else{
   		nightday = 0;
   	}
-
   }
 
   deltalux = prevavglux - avg;
@@ -214,11 +196,11 @@ void light_handler(int avg) {
   	//nightday==1  day
   if(nightday == 1){
   	if(deltalux > light_z){
-  		bright = BRIGHTER
+  		bright = BRIGHTER;
   	} else if(deltalux < -1 * light_z) {
-  		bright=DARKER
+  		bright=DARKER;
   	} else {
-  		bright=LITTLECHANE
+  		bright=LITTLECHANE; 
   	}
   	//nightday==0  night
   }else{
