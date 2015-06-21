@@ -200,7 +200,7 @@ void light_handler(int avg) {
   	} else if(deltalux < -1 * light_z) {
   		bright=DARKER;
   	} else {
-  		bright=LITTLECHANE; 
+  		bright=LITTLECHANE;
   	}
   	//nightday==0  night
   }else{
