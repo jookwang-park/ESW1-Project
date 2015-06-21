@@ -83,22 +83,24 @@ int SPI_Read_Value(int farm_fd, unsigned char channel) {
 	return adcValue;
 }
 
-int SPI_Register_Handler(int farm_fd, unsigned char channel, int collect_time, int response_time, void (*handler)(int)) {
+int SPI_Register_Handler(int farm_fd, unsigned char channel, int *collect_time, int *response_time, void (*handler)(int)) {
 	int value = 0;
 	int resCount = 0;
 	int average = 0;
-	int divider = response_time / collect_time;
+	int divider = (*response_time) / (*collect_time);
 	while(1) {
+		divider = (*response_time) / (*collect_time);
 		value = SPI_Read_Value(farm_fd, channel);
-		if( resCount == response_time ) {
+		if( resCount >= *response_time ) {
 			handler(average / divider);
 			average = 0;
 			resCount = 0;
 		} else {
 			resCount++;
 			average += value;
+
 		}
-		sleep(collect_time);
+		sleep(*collect_time);
 	}
 	return 0;
 }
