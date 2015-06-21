@@ -13,6 +13,7 @@
 
 extern void *sprinkler_init(void *data);
 extern void *light_init(void *data);
+extern void *htmodule_init(void *data);
 
 int main(int argc, char *argv[]) {
 
@@ -25,6 +26,9 @@ int main(int argc, char *argv[]) {
 
 	//light thread
 	pthread_t light;
+
+	//htmodule thread
+	pthread_t htmodule;
 
 
 
@@ -81,6 +85,9 @@ int main(int argc, char *argv[]) {
 
 
 
+	// Load htmodule Module 
+	pthread_create(&htmodule, NULL, htmodule_init, (void*)&info);
+	pthread_detach(htmodule);
 
 
 
