@@ -53,7 +53,9 @@ static struct schedule_t *schedules[SCHEDULE_SIZE];
 int mqtt_onReceiver(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
 	// 서버로부터 설정에 대한 값이 들어왔을 경우
 	if( strncmp(topicName, topic_sprinkler_config, topicLen) == 0 ) {
-		char **setting = (char**)get_string_token((char*)message->payload, " ");
+		char **setting = NULL;
+		if( message->payloadlen <= 3 ) return 1;
+		setting = (char**)get_string_token((char*)message->payload, " ");
 		if( setting != NULL ) {
 			// Is Set?
 			if( strcmp(setting[0], "SET") == 0 ) {
