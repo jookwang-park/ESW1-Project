@@ -106,7 +106,7 @@ void add_schedule(int hour, int min, int running_time) {
 			schedules[i]->hour = hour;
 			schedules[i]->min = min;
 			schedules[i]->is_run = 0;
-			schedules[i]->running_time = running_time;
+			schedules[i]->running_time = running_time*10;
 			return;
 		}
 	}
@@ -117,7 +117,7 @@ void edit_schedule(int id, int hour, int min, int running_time) {
 		schedules[id]->hour = hour;
 		schedules[id]->min = min;
 		schedules[id]->is_run = 0;
-		schedules[id]->running_time = running_time;
+		schedules[id]->running_time = running_time*10;
 	}
 }
 
@@ -164,6 +164,7 @@ void sprinkler_scheduling() {
 			if( t->tm_hour == hour && t->tm_min == min && is_run == 0 ) {
 				state = SCHEDULED;
 				schedules[i]->is_run = 1;
+				running_time = schedules[i]->running_time;
 			} else if ( (t->tm_hour != hour || t->tm_min != min) && is_run == 1 ) {
 				schedules[i]->is_run = 0;
 			}
