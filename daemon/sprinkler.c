@@ -16,6 +16,10 @@ void sprinkler_start();
 void sprinkler_end();
 void sprinkler_state();
 
+void add_schedule(int hour, int min, int running_time);
+void edit_schedule(int id, int hour, int min, int running_time);
+void delete_schedule(int id);
+
 struct schedule_t {
 	int id;
 	int hour;
@@ -49,13 +53,43 @@ static struct schedule_t *schedules[SCHEDULE_SIZE];
 int mqtt_onReceiver(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
 	// 서버로부터 설정에 대한 값이 들어왔을 경우
 	if( strncmp(topicName, topic_sprinkler_config, topicLen) == 0 ) {
-		char **setting = (char**)get_setting((char*)message->payload, message->payloadlen);
+		char **setting = NULL;
+		if( message->payloadlen <= 3 ) return 1;
+		setting = (char**)get_string_token((char*)message->payload, " ");
 		if( setting != NULL ) {
-			if( strcmp(setting[0], "running_time") == 0 ) {
-				printf("RUNNING_TIME: %s\n", setting[1]);
-				running_time = atoi(setting[1]);
-				destroy_setting(setting);
+			// Is Set?
+			if( strcmp(setting[0], "SET") == 0 ) {
+				if( strcmp(setting[1], "running_time") == 0 ) {
+					running_time = atoi(setting[2]);
+				}
+			} else if( strcmp(setting[0], "ADD") == 0 ) { // Is Add ?
+				if( strcmp(setting[1], "schedule") == 0 ) {
+					char **tokens = (char**)get_string_token(setting[2], "|");
+					int hour = atoi(tokens[0]);
+					int min = atoi(tokens[1]);
+					int running_time = atoi(tokens[2]);
+					add_schedule(hour, min, running_time);
+					free_token(tokens, 3);
+				}
+			} else if( strcmp(setting[0], "DELETE") == 0 ) { // Is Delete?
+				if( strcmp(setting[1], "schedule") == 0 ) {
+					char **tokens = (char**)get_string_token(setting[2], "|");
+					int id = atoi(tokens[0]);
+					delete_schedule(id);
+					free_token(tokens, 1);
+				}
+			} else if( strcmp(setting[0], "EDIT") == 0 ) { // Is Edit?
+				if( strcmp(setting[1], "schedule") == 0 ) {
+					char **tokens = (char**)get_string_token(setting[2], "|");
+					int id = atoi(tokens[0]);
+					int hour = atoi(tokens[1]);
+					int min = atoi(tokens[2]);
+					int running_time = atoi(tokens[3]);
+					edit_schedule(id, hour, min, running_time);
+					free_token(tokens, 4);
+				}
 			}
+			free_token(setting, 3);
 		}
 	}
 	MQTTClient_freeMessage(&message);
@@ -63,7 +97,7 @@ int mqtt_onReceiver(void *context, char *topicName, int topicLen, MQTTClient_mes
 	return 1;
 }
 
-void add_schedule(int hour, int min) {
+void add_schedule(int hour, int min, int running_time) {
 	int i = 0 ;
 	for( i ; i < SCHEDULE_SIZE ; i++ ){
 		if( schedules[i] == NULL ) {
@@ -72,7 +106,7 @@ void add_schedule(int hour, int min) {
 			schedules[i]->hour = hour;
 			schedules[i]->min = min;
 			schedules[i]->is_run = 0;
-			schedules[i]->running_time = 30;
+			schedules[i]->running_time = running_time*10;
 			return;
 		}
 	}
@@ -83,7 +117,7 @@ void edit_schedule(int id, int hour, int min, int running_time) {
 		schedules[id]->hour = hour;
 		schedules[id]->min = min;
 		schedules[id]->is_run = 0;
-		schedules[id]->running_time = running_time;
+		schedules[id]->running_time = running_time*10;
 	}
 }
 
@@ -130,6 +164,7 @@ void sprinkler_scheduling() {
 			if( t->tm_hour == hour && t->tm_min == min && is_run == 0 ) {
 				state = SCHEDULED;
 				schedules[i]->is_run = 1;
+				running_time = schedules[i]->running_time;
 			} else if ( (t->tm_hour != hour || t->tm_min != min) && is_run == 1 ) {
 				schedules[i]->is_run = 0;
 			}
@@ -138,8 +173,59 @@ void sprinkler_scheduling() {
 }
 
 void sprinkler_scheduled() {
-	mqtt_pub(mqtt, "Scheduled!", topic_sprinkler_status, 0);
-	state =  START;
+	// 조건 검사 
+		// 맞으면 
+	int tmp_nightday =0;
+	int tmp_weather = 0;
+
+	tmp_weather = get_condition_weather();
+	tmp_nightday = get_condition_day();
+
+	if(tmp_nightday == DAY){
+		//일단 낮.
+		switch(tmp_weather){
+			case NONE:
+			//실패 낮 & 날씨정보없음.
+
+			mqtt_pub(mqtt, "A003", topic_sprinkler_status, 0);
+			state = SCHEDULING;
+			break;
+
+			case DRYNESS:
+			//성공 & 낮 건조
+
+			mqtt_pub(mqtt, "A001", topic_sprinkler_status, 0);
+			mqtt_pub(mqtt, "Scheduled!", topic_sprinkler_status, 0);
+			state =  START;
+			break;
+
+			case SUNNY:
+			//성공 낮 & 맑음
+
+			mqtt_pub(mqtt, "A002", topic_sprinkler_status, 0);
+			mqtt_pub(mqtt, "Scheduled!", topic_sprinkler_status, 0);
+			state =  START;
+			break;
+
+			case CLOUDY:
+			//실패 낮 & 구름낌
+			mqtt_pub(mqtt, "A004", topic_sprinkler_status, 0);
+			state = SCHEDULING;
+			break;
+
+			case RAINY:
+			//실패 낮 & 비옴.
+			mqtt_pub(mqtt, "A005", topic_sprinkler_status, 0);
+			state = SCHEDULING;
+			break;
+		}
+
+	} else{
+
+		//밤이라서 안됨.
+		mqtt_pub(mqtt, "A006", topic_sprinkler_status, 0);
+		state = SCHEDULING;
+	}
 }
 
 void sprinkler_start() {

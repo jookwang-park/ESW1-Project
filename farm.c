@@ -11,6 +11,7 @@
 #include "speaker.h"
 #include "spi.h"
 #include "dht.h"
+#include "pir.h"
 
 MODULE_LICENSE("GPL");
 
@@ -78,6 +79,14 @@ static long farm_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 			value = module_dht_get_value();
 			copy_size = copy_to_user((int*)arg, (int*)&value, sizeof(value));
 			break;
+		case PIR_SET_SENS:
+			copy_size = copy_from_user((int*)&value, (int*)arg, sizeof(value));
+			module_pir_set_sens(value);
+			break;
+		case PIR_GET_DATA:
+			value = module_pir_get_data();
+			copy_size = copy_to_user((int*)arg, (int*)&value, sizeof(value));
+			break;
 		default:
 			break;
 	}
@@ -116,6 +125,10 @@ static int __init farm_init(void) {
 	ret = module_dht_init();	
 	if( ret < 0 ) return -1;
 
+	// Initialize PIR Device
+	ret = module_pir_init();	
+	if( ret < 0 ) return -1;
+
 	printk("Hello Farm!\n");
 	return 0;
 }
@@ -134,6 +147,7 @@ static void __exit farm_exit(void) {
 	module_speaker_exit();
 	module_spi_exit();
 	module_dht_exit();
+	module_pir_exit();
 	printk("Goodbye Farm!\n");
 }
 

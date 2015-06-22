@@ -13,6 +13,8 @@
 
 extern void *sprinkler_init(void *data);
 extern void *light_init(void *data);
+extern void *htmodule_init(void *data);
+extern void *sparrow_init(void *data);
 
 int main(int argc, char *argv[]) {
 
@@ -21,10 +23,10 @@ int main(int argc, char *argv[]) {
 	int farm_fd = 0;
 	char topic_status[16] = {0,};
 	pthread_t sprinkler;
-	struct daemon_info_t info;
-
-	//light thread
 	pthread_t light;
+	pthread_t sparrow;
+	pthread_t htmodule;
+	struct daemon_info_t info;
 
 
 
@@ -47,16 +49,11 @@ int main(int argc, char *argv[]) {
 	setsid();
 
 	*/
-
-
 	
 	// MQTT Setting
 	client = (MQTTClient*)mqtt_create(argv[1], NULL);
 	mqtt_topic(argv[1], "status", topic_status);
 	mqtt_pub(client, "Daemon Start", topic_status, 0);
-
-
-
 	
 	// Open Device Driver
 	farm_fd = farm_open();	
@@ -68,27 +65,22 @@ int main(int argc, char *argv[]) {
 	info.dev_name = argv[1];
 	info.farm_fd = farm_fd;
 	info.mqtt = (void*)client;
-
 	
 	// Load Sub Module 
 	pthread_create(&sprinkler, NULL, sprinkler_init, (void*)&info);
 	pthread_detach(sprinkler);
 
-
 	// Load Light Module 
 	pthread_create(&light, NULL, light_init, (void*)&info);
 	pthread_detach(light);
 
+	// Load Sparrow Module 
+	pthread_create(&sparrow, NULL, sparrow_init, (void*)&info);
+	pthread_detach(sparrow);
 
-
-
-
-
-
-
-
-
-
+	// Load htmodule Module 
+	pthread_create(&htmodule, NULL, htmodule_init, (void*)&info);
+	pthread_detach(htmodule);
 
 
 	// Daemon Start
