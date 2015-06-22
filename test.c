@@ -58,7 +58,12 @@ int main(void) {
 	// SPI_Set_Module(farm_fd, 0, 1, 10, light_handler, 10);
 
 
-
+	while(1) {
+		int value = 0;
+		value = ULTRASONIC_distance(farm_fd);
+		printf("value: %d cm\n", value);
+		sleepu(1000);
+	}
 
 	farm_close();
 	return 0;

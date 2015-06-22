@@ -12,6 +12,7 @@
 #include "spi.h"
 #include "dht.h"
 #include "pir.h"
+#include "ultrasonic.h"
 
 MODULE_LICENSE("GPL");
 
@@ -87,6 +88,16 @@ static long farm_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 			value = module_pir_get_data();
 			copy_size = copy_to_user((int*)arg, (int*)&value, sizeof(value));
 			break;
+		case ULTRASONIC_OFF:
+			module_ultrasonic_trigger_off();
+			break;
+		case ULTRASONIC_ON:
+			module_ultrasonic_trigger_on();
+			break;
+		case ULTRASONIC_ECHO:
+			value = module_ultrasonic_get_echo();
+			copy_size = copy_to_user((int*)arg, (int*)&value, sizeof(value));
+			break;
 		default:
 			break;
 	}
@@ -129,6 +140,10 @@ static int __init farm_init(void) {
 	ret = module_pir_init();	
 	if( ret < 0 ) return -1;
 
+	// Initialize UltraSonic Device
+	ret = module_ultrasonic_init();	
+	if( ret < 0 ) return -1;
+
 	printk("Hello Farm!\n");
 	return 0;
 }
@@ -148,6 +163,7 @@ static void __exit farm_exit(void) {
 	module_spi_exit();
 	module_dht_exit();
 	module_pir_exit();
+	module_ultrasonic_exit();
 	printk("Goodbye Farm!\n");
 }
 

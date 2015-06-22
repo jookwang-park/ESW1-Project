@@ -25,6 +25,11 @@
 #define	PIR_SET_SENS	_IOWR(IOCTL_NUM, IOCTL_START_NUM+40, unsigned long *)
 #define	PIR_GET_DATA	_IOWR(IOCTL_NUM, IOCTL_START_NUM+41, unsigned long *)
 
+// Define UltraSonic IOCTL Commands
+#define ULTRASONIC_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM+50, unsigned long *)
+#define ULTRASONIC_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM+51, unsigned long *)
+#define ULTRASONIC_ECHO	_IOWR(IOCTL_NUM, IOCTL_START_NUM+52, unsigned long *)
+
 // Define DHT IOCTL Commands
 #define DHT_OFF	_IOWR(IOCTL_NUM, IOCTL_START_NUM+60, unsigned long *)
 #define DHT_ON	_IOWR(IOCTL_NUM, IOCTL_START_NUM+61, unsigned long *)
