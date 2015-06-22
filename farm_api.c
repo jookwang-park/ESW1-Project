@@ -4,11 +4,16 @@
 #include <stdlib.h>
 #include <sys/fcntl.h>
 #include <sys/ioctl.h>
+#include <stdint.h>
 #include "farm_api.h"
 
 static int farm_fd = 0;
+static uint64_t epochMicro ;
 
 int farm_open() {
+	struct timeval tv ;
+	gettimeofday (&tv, NULL) ;
+	epochMicro = (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)(tv.tv_usec) ;
 	farm_fd = open("/dev/"FARM_DEV, O_RDWR);
 	return farm_fd;
 }
@@ -56,4 +61,14 @@ void sleepu (unsigned int size) {
   }
 }
 
+unsigned int micros (void)
+{
+  struct timeval tv ;
+  uint64_t now ;
+
+  gettimeofday (&tv, NULL) ;
+  now  = (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec ;
+
+  return (uint32_t)(now - epochMicro) ;
+}
 
