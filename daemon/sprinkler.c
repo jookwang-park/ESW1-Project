@@ -52,6 +52,7 @@ static struct schedule_t *schedules[SCHEDULE_SIZE];
 
 int mqtt_onReceiver(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
 	// 서버로부터 설정에 대한 값이 들어왔을 경우
+	printf("%s\n", (char*)message->payload);
 	if( strncmp(topicName, topic_sprinkler_config, topicLen) == 0 ) {
 		char **setting = NULL;
 		if( message->payloadlen <= 3 ) return 1;
@@ -69,6 +70,7 @@ int mqtt_onReceiver(void *context, char *topicName, int topicLen, MQTTClient_mes
 					int min = atoi(tokens[1]);
 					int running_time = atoi(tokens[2]);
 					add_schedule(hour, min, running_time);
+					printf("GOOD\n");
 					free_token(tokens, 3);
 				}
 			} else if( strcmp(setting[0], "DELETE") == 0 ) { // Is Delete?

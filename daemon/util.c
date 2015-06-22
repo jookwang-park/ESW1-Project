@@ -40,7 +40,7 @@ MQTTClient *mqtt_create(char *clientid, MQTTClient_messageArrived *arrived) {
 	MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 
 	MQTTClient_create(context, MQTT_ADDRESS, clientid, MQTTCLIENT_PERSISTENCE_NONE, NULL);
-    conn_opts.keepAliveInterval = 0;
+    conn_opts.keepAliveInterval = 144000;
     conn_opts.cleansession = 1;
 	if(arrived) MQTTClient_setCallbacks(*context, NULL, NULL, arrived, NULL);
 	MQTTClient_connect(*context, &conn_opts);
