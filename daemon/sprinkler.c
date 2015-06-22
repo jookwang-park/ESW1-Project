@@ -173,8 +173,59 @@ void sprinkler_scheduling() {
 }
 
 void sprinkler_scheduled() {
-	mqtt_pub(mqtt, "Scheduled!", topic_sprinkler_status, 0);
-	state =  START;
+	// 조건 검사 
+		// 맞으면 
+	int tmp_nightday =0;
+	int tmp_weather = 0;
+
+	tmp_weather = get_condition_weather();
+	tmp_nightday = get_condition_day();
+
+	if(tmp_nightday == DAY){
+		//일단 낮.
+		switch(tmp_weather){
+			case NONE:
+			//실패 낮 & 날씨정보없음.
+
+			mqtt_pub(mqtt, "A003", topic_sprinkler_status, 0);
+			state = SCHEDULING;
+			break;
+
+			case DRYNESS:
+			//성공 & 낮 건조
+
+			mqtt_pub(mqtt, "A001", topic_sprinkler_status, 0);
+			mqtt_pub(mqtt, "Scheduled!", topic_sprinkler_status, 0);
+			state =  START;
+			break;
+
+			case SUNNY:
+			//성공 낮 & 맑음
+
+			mqtt_pub(mqtt, "A002", topic_sprinkler_status, 0);
+			mqtt_pub(mqtt, "Scheduled!", topic_sprinkler_status, 0);
+			state =  START;
+			break;
+
+			case CLOUDY:
+			//실패 낮 & 구름낌
+			mqtt_pub(mqtt, "A004", topic_sprinkler_status, 0);
+			state = SCHEDULING;
+			break;
+
+			case RAINY:
+			//실패 낮 & 비옴.
+			mqtt_pub(mqtt, "A005", topic_sprinkler_status, 0);
+			state = SCHEDULING;
+			break;
+		}
+
+	} else{
+
+		//밤이라서 안됨.
+		mqtt_pub(mqtt, "A006", topic_sprinkler_status, 0);
+		state = SCHEDULING;
+	}
 }
 
 void sprinkler_start() {

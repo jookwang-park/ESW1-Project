@@ -55,9 +55,8 @@ light에서
 
 
 
-
-int ht_humidity();
-int ht_temperature();
+int get_ht_humidity();
+int get_ht_temperature();
 void htmodule_state();
 void htmodule_config();
 void htmodule_start();
@@ -176,9 +175,9 @@ void htmodule_state(){
 	}
 }
 
-int ht_humidity(){
+int get_ht_humidity(){
 	return tempdht.humidity;
 };
-int ht_temperature(){
+int get_ht_temperature(){
 	return tempdht.temperature;
 }

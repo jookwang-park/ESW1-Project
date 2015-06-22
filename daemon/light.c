@@ -6,8 +6,6 @@
 #include "daemon.h"
 #include "include/MQTTClient.h"
 #include "../dht_api.h"
-
-
 /*
 State machine 
 config->start->config   
@@ -25,6 +23,11 @@ void light_config();
 void light_start();
 
 int mqtt_light_onReceiver(void *context, char *topicName, int topicLen, MQTTClient_message *message);
+
+
+int get_condition_day();
+int get_condition_weather();
+
 
 enum LIGHT_STATE {
 	INIT,
@@ -61,6 +64,7 @@ enum WEATHER {	//  humidity, temperature
 	CLOUDY,		// 50~70	, 23~
 	RAINY  		// 70~		, 20~ 
 };
+
 static enum WEATHER weather = NONE;
 
 static char *dev_name = NULL;
@@ -163,8 +167,11 @@ void light_handler(int avg) {
 	time_t timer;
 	struct tm *t;
 
-	humidity = ht_humidity();
-	temperature = ht_temperature();
+	humidity = 32;//get_ht_humidity();
+	temperature = 24;//get_ht_temperature();
+
+	int a = get_ht_humidity();
+	int b = get_ht_temperature();
 
 	timer = time(NULL); // 현재 시각을 초 단위로 얻기
 
@@ -214,7 +221,7 @@ void light_handler(int avg) {
 	if(nightday == 1){
 		if(deltalux > light_z){
 			bright = BRIGHTER;
-			
+
 			if(humidity<=30){
 				if(temperature>27){
 					weather=DRYNESS;
@@ -259,3 +266,12 @@ void light_handler(int avg) {
 	}
 }
 
+int get_condition_day(){
+
+	return nightday;
+}
+
+int get_condition_weather(){
+
+	return weather;
+}
