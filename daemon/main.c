@@ -28,9 +28,8 @@ int main(int argc, char *argv[]) {
 	pthread_t htmodule;
 	struct daemon_info_t info;
 
+	if( argc <= 1 ) exit(0);
 
-
-	/*   
 	pid_t pid;	
 	pid = fork();
 	if( pid == -1 ) {
@@ -47,8 +46,6 @@ int main(int argc, char *argv[]) {
 
 	chdir("/");
 	setsid();
-
-	*/
 	
 	// MQTT Setting
 	client = (MQTTClient*)mqtt_create(argv[1], NULL);
